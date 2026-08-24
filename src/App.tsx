@@ -137,6 +137,7 @@ export const App: React.FC = () => {
             syncPct={state.syncPct}
             syncStep={state.syncStep}
             onFinish={() => store.startSyncSimulation()}
+            onGoogleOAuth={() => store.connectGoogleAccount()}
           />
         ) : (
           <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-[var(--side)] text-[var(--fg)]">
@@ -215,9 +216,9 @@ export const App: React.FC = () => {
               </div>
             )}
 
-            {/* Animated Full-Screen Views with Native Right-Slide Animation */}
+            {/* Animated Full-Screen Views with Entrance Slide from Left */}
             {state.screen === 'mail' && (
-              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-left">
                 <MailReaderView
                   mail={selectedMail}
                   aiStatus={selectedMail ? state.aiSum[selectedMail.id] || 'idle' : 'idle'}
@@ -237,7 +238,7 @@ export const App: React.FC = () => {
             )}
 
             {state.screen === 'promo' && (
-              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-left">
                 <PromoReaderView
                   promo={selectedPromo}
                   onBack={() => store.setState({ screen: null, selectedPromoId: null })}
@@ -248,7 +249,7 @@ export const App: React.FC = () => {
             )}
 
             {state.screen === 'digest' && (
-              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-left">
                 <DigestView
                   onBack={() => store.setState({ screen: null })}
                 />
@@ -256,7 +257,7 @@ export const App: React.FC = () => {
             )}
 
             {state.screen === 'settings' && (
-              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-left">
                 <SettingsView
                   settings={state.settings}
                   notif={state.notif}
@@ -278,7 +279,7 @@ export const App: React.FC = () => {
             )}
 
             {state.screen === 'compose' && (
-              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-left">
                 <ComposeView
                   initialTo={state.cpTo}
                   initialSubject={state.cpSubject}
@@ -293,7 +294,7 @@ export const App: React.FC = () => {
             )}
 
             {state.screen === 'search' && (
-              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-left">
                 <SearchView
                   mails={state.mails}
                   promos={state.promos}
@@ -310,7 +311,7 @@ export const App: React.FC = () => {
             )}
 
             {state.screen === 'newRule' && (
-              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-left">
                 <RuleEditorView
                   initialRule={editingRule}
                   onClose={() => store.setState({ screen: null, editingRuleId: null })}

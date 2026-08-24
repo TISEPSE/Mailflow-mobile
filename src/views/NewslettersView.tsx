@@ -26,14 +26,13 @@ export const NewslettersView: React.FC<NewslettersViewProps> = ({
     : news.filter(n => n.tags.includes(selectedTag));
 
   return (
-    <div className="flex-1 overflow-y-auto mf-scroll px-3.5 pt-1 pb-20 flex flex-col gap-3.5">
-      {/* Daily Digest Synthesis Card (Image 3) */}
+    <div className="flex-1 overflow-y-auto mf-scroll px-3.5 pt-1 pb-20 flex flex-col gap-4">
+      {/* Daily Digest Synthesis Card */}
       <div
         onClick={onOpenDigest}
         className="p-4 rounded-3xl bg-[#D3E3FD] dark:bg-[#0B3875] shadow-xs cursor-pointer active:scale-[0.99] transition-all flex items-center justify-between gap-3 select-none"
       >
         <div className="flex items-center gap-3 min-w-0">
-          {/* Sparkles icon in circle */}
           <div className="w-10 h-10 rounded-full bg-[#0B57D0] text-white flex items-center justify-center flex-none shadow-xs">
             <Icon name="auto_awesome" size={20} filled />
           </div>
@@ -68,8 +67,8 @@ export const NewslettersView: React.FC<NewslettersViewProps> = ({
         </div>
       </div>
 
-      {/* Tags Filter Carousel (Image 3) */}
-      <div className="flex items-center gap-2 overflow-x-auto mf-scroll py-0.5 select-none">
+      {/* Uncompressed Tags Filter Carousel */}
+      <div className="flex items-center gap-2.5 overflow-x-auto mf-scroll py-1 px-0.5 select-none whitespace-nowrap scroll-smooth">
         {ALL_TAGS.map((tag) => {
           const isSelected = selectedTag === tag;
           return (
@@ -77,7 +76,7 @@ export const NewslettersView: React.FC<NewslettersViewProps> = ({
               key={tag}
               type="button"
               onClick={() => onSelectTag(tag)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all active:scale-95 cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold shrink-0 flex-none transition-all active:scale-95 cursor-pointer ${
                 isSelected
                   ? 'bg-[#0B57D0] text-white shadow-xs'
                   : 'bg-[#ECEEEF] dark:bg-[#2D2F31] text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -89,12 +88,12 @@ export const NewslettersView: React.FC<NewslettersViewProps> = ({
         })}
       </div>
 
-      {/* Newsletters list cards (Image 3) */}
-      <div className="flex flex-col gap-3">
+      {/* Newsletters list cards */}
+      <div className="flex flex-col gap-3.5">
         {filtered.map((item) => (
           <div
             key={item.id}
-            className="p-4.5 rounded-3xl bg-[var(--card)] border border-[var(--line)]/50 shadow-xs flex flex-col gap-3"
+            className="p-4.5 rounded-3xl bg-[var(--card)] border border-[var(--line)]/50 shadow-xs flex flex-col gap-3.5"
           >
             {/* Header */}
             <div className="flex items-center justify-between gap-2">
@@ -124,7 +123,7 @@ export const NewslettersView: React.FC<NewslettersViewProps> = ({
               {item.summary}
             </div>
 
-            {/* Actions Row (Image 3) */}
+            {/* Actions Row */}
             <div className="flex items-center gap-2.5 pt-1">
               <button
                 type="button"

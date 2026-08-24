@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { Account } from '../types';
 import { Icon } from '../components/Icon';
+import { LogoGoogle } from '../components/LogoGoogle';
 
 interface OnboardingViewProps {
   accounts: Account[];
   syncPct: number;
   syncStep: string;
   onFinish: () => void;
+  onGoogleOAuth?: () => void;
 }
 
 export const OnboardingView: React.FC<OnboardingViewProps> = ({
   accounts,
   syncPct,
   syncStep,
-  onFinish
+  onFinish,
+  onGoogleOAuth
 }) => {
   const [step, setStep] = useState(0);
   const [selectedAccount, setSelectedAccount] = useState(accounts[0]?.email || '');
@@ -48,12 +51,32 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({
         </div>
       )}
 
-      {/* Step 1: Pick Account */}
+      {/* Step 1: Google OAuth Account Sign-In */}
       {step === 1 && (
-        <div className="flex-1 flex flex-col justify-center gap-4 py-4 animate-fade-in">
+        <div className="flex-1 flex flex-col justify-center gap-5 py-4 animate-fade-in">
           <div className="text-center">
-            <h2 className="text-lg font-bold text-[var(--fg)]">Connectez votre compte</h2>
-            <p className="text-xs text-[var(--sub)] mt-1">Sélectionnez le compte Google à synchroniser</p>
+            <h2 className="text-lg font-bold text-[var(--fg)]">Connexion Google OAuth</h2>
+            <p className="text-xs text-[var(--sub)] mt-1">Connectez votre vrai compte Gmail sécurisé</p>
+          </div>
+
+          {/* Official Google OAuth Sign-in Button */}
+          <button
+            type="button"
+            onClick={() => {
+              if (onGoogleOAuth) onGoogleOAuth();
+              setStep(2);
+              onFinish();
+            }}
+            className="w-full py-4 px-6 rounded-3xl bg-white dark:bg-[#232425] hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md flex items-center justify-center gap-3.5 text-sm font-semibold text-gray-800 dark:text-gray-100 active:scale-98 transition-all cursor-pointer"
+          >
+            <LogoGoogle taille="1.5rem" />
+            <span>Se connecter avec Google</span>
+          </button>
+
+          <div className="flex items-center gap-3 my-1">
+            <div className="flex-1 h-px bg-[var(--line)]/50" />
+            <span className="text-[11px] text-[var(--sub)] font-medium">ou choisir un compte enregistré</span>
+            <div className="flex-1 h-px bg-[var(--line)]/50" />
           </div>
 
           <div className="rounded-3xl bg-[var(--card)] border border-[var(--line)]/60 overflow-hidden shadow-xs divide-y divide-[var(--line)]/50">
@@ -91,7 +114,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({
             <Icon name="sync" size={30} className="text-[var(--accent)]" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-[var(--fg)]">Premier relevé en cours</h2>
+            <h2 className="text-lg font-bold text-[var(--fg)]">Synchronisation Google OAuth</h2>
             <p className="text-xs text-[var(--sub)] mt-1">{syncStep}</p>
           </div>
 
@@ -109,6 +132,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({
       <div className="flex items-center justify-between gap-3 pt-4 border-t border-[var(--line)]/40">
         {step > 0 && step < 2 ? (
           <button
+            type="button"
             onClick={() => setStep(step - 1)}
             className="px-4 py-2.5 rounded-2xl text-xs font-semibold text-[var(--sub)]"
           >
@@ -118,6 +142,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({
 
         {step < 2 ? (
           <button
+            type="button"
             onClick={() => {
               if (step === 1) {
                 setStep(2);
@@ -133,6 +158,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({
           </button>
         ) : (
           <button
+            type="button"
             onClick={onFinish}
             disabled={syncPct < 100}
             className={`flex items-center gap-1.5 px-6 py-3 rounded-full text-xs font-bold shadow-md transition-all ${

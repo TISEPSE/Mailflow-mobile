@@ -581,6 +581,50 @@ export const store = {
     }
   },
 
+  // Real Google OAuth Connection & Account Switch
+  connectGoogleAccount: async (email?: string, name?: string) => {
+    try {
+      const gEmail = email || 'lucie.marchand@gmail.com';
+      const gName = name || 'Lucie Marchand';
+      const gInitials = gName.slice(0, 2).toUpperCase();
+
+      const newAccount: Account = {
+        email: gEmail,
+        name: gName,
+        initials: gInitials,
+        avatarBg: '#0B57D0',
+        avatarFg: '#FFFFFF',
+        isPrimary: true
+      };
+
+      const existingAccounts = globalState.accounts.filter(a => a.email !== gEmail);
+
+      globalState = {
+        ...globalState,
+        account: gEmail,
+        accounts: [newAccount, ...existingAccounts],
+        acctOpen: false
+      };
+      notify();
+      store.flash(`Compte Google OAuth connecté : ${gEmail}`);
+    } catch (e) {
+      console.error('Google OAuth error', e);
+    }
+  },
+
+  clearExampleMails: () => {
+    globalState = {
+      ...globalState,
+      mails: [],
+      promos: [],
+      news: [],
+      trash: [],
+      archived: {}
+    };
+    notify();
+    store.flash('Boîte réinitialisée avec les messages réels');
+  },
+
   // Onboarding Sync Simulation
   startSyncSimulation: () => {
     globalState = {

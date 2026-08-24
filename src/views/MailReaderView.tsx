@@ -61,7 +61,7 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
           </span>
         </div>
 
-        {/* Right 3-dots Menu Button */}
+        {/* Right 3-dots Kebab Menu Button */}
         <div className="relative">
           <button
             type="button"
@@ -72,23 +72,23 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
             <Icon name="more_vert" size={22} />
           </button>
 
-          {/* Context Menu Popup (Image 2) */}
+          {/* Context Menu Popup Modal (Matching Photo) */}
           {menuOpen && (
             <>
               <div 
-                className="fixed inset-0 z-40" 
+                className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]" 
                 onClick={() => setMenuOpen(false)} 
               />
-              <div className="absolute right-0 top-11 z-50 min-w-[210px] bg-white dark:bg-[#232425] rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 p-2 animate-pop origin-top-right flex flex-col gap-0.5">
+              <div className="absolute right-0 top-11 z-50 min-w-[240px] bg-white dark:bg-[#232425] rounded-[28px] shadow-2xl border border-gray-100 dark:border-gray-800 p-3 animate-pop origin-top-right flex flex-col gap-1 select-none">
                 <button
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
                     onReply(mail);
                   }}
-                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
+                  className="flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
                 >
-                  <Icon name="reply" size={19} className="text-gray-600 dark:text-gray-300" />
+                  <Icon name="reply" size={20} className="text-gray-700 dark:text-gray-300" />
                   <span>Répondre</span>
                 </button>
 
@@ -98,9 +98,9 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
                     setMenuOpen(false);
                     handleAiClick();
                   }}
-                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
+                  className="flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
                 >
-                  <Icon name="auto_awesome" size={19} className="text-blue-600 dark:text-blue-400" />
+                  <Icon name="auto_awesome" size={20} className="text-[#0B57D0] dark:text-blue-400" />
                   <span>Résumé IA</span>
                 </button>
 
@@ -111,9 +111,9 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
                     onArchive(mail.id);
                     onBack();
                   }}
-                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
+                  className="flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
                 >
-                  <Icon name="archive" size={19} className="text-gray-600 dark:text-gray-300" />
+                  <Icon name="archive" size={20} className="text-gray-700 dark:text-gray-300" />
                   <span>Archiver</span>
                 </button>
 
@@ -123,9 +123,9 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
                     setMenuOpen(false);
                     onOpenFolderSheet(mail.id);
                   }}
-                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
+                  className="flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
                 >
-                  <Icon name="folder_open" size={19} className="text-gray-600 dark:text-gray-300" />
+                  <Icon name="folder_open" size={20} className="text-gray-700 dark:text-gray-300" />
                   <span>Archiver dans...</span>
                 </button>
 
@@ -138,9 +138,9 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
                     onTrash(mail.id);
                     onBack();
                   }}
-                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-[#B3261E] hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors text-left w-full cursor-pointer"
+                  className="flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-semibold text-[#C5221F] hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors text-left w-full cursor-pointer"
                 >
-                  <Icon name="delete" size={19} className="text-[#B3261E]" />
+                  <Icon name="delete" size={20} className="text-[#C5221F]" />
                   <span>Supprimer</span>
                 </button>
               </div>
@@ -156,9 +156,8 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
           {mail.subject}
         </h1>
 
-        {/* Sender details (Image 1) */}
+        {/* Sender details */}
         <div className="flex items-center gap-3 pt-1">
-          {/* Avatar (Peach/warm tone for TN or custom initials) */}
           <div className="w-11 h-11 rounded-full flex-none bg-[#FFDBCF] text-[#6E3024] dark:bg-[#733324] dark:text-[#FFDBCF] flex items-center justify-center text-sm font-bold shadow-2xs">
             {mail.initials}
           </div>
@@ -177,7 +176,7 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
           </div>
         </div>
 
-        {/* AI Summary Chip / Card (Image 1) */}
+        {/* AI Summary Chip / Card */}
         <div className="self-start flex flex-col gap-2 pt-1">
           <button
             type="button"
@@ -224,7 +223,7 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
         </div>
       </div>
 
-      {/* Bottom Sticky Primary Blue Reply Button (Image 1) */}
+      {/* Bottom Sticky Primary Blue Reply Button */}
       <div className="flex-none p-4 pt-2 bg-gradient-to-t from-[var(--side)] via-[var(--side)] to-transparent">
         <button
           type="button"
