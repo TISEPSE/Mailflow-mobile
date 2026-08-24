@@ -19,7 +19,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({
   const [selectedAccount, setSelectedAccount] = useState(accounts[0]?.email || '');
 
   return (
-    <div className="flex-1 flex flex-col justify-between p-6 bg-[var(--side)] relative z-40 overflow-hidden select-none animate-fade-in">
+    <div className="flex-1 flex flex-col justify-between p-6 bg-[var(--side)] relative z-40 overflow-hidden select-none animate-fade-in pt-safe pb-safe">
       
       {/* Top step indicator */}
       <div className="flex items-center justify-center gap-1.5 pt-2">

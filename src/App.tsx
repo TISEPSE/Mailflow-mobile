@@ -101,6 +101,7 @@ export const App: React.FC = () => {
               <TopHeader
                 currentAccount={currentAccount}
                 searchHint={searchHints[state.tab] || 'Rechercher…'}
+                isNative={isNative}
                 onOpenSearch={() => store.setState({ screen: 'search' })}
                 onOpenAccounts={() => store.setState({ acctOpen: true })}
               />
@@ -108,7 +109,7 @@ export const App: React.FC = () => {
 
             {/* Main Tabs Navigation Body */}
             {!state.screen && (
-              <div className="flex-1 flex flex-col min-h-0 relative">
+              <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
                 {state.tab === 1 && (
                   <CourrierView
                     mails={state.mails}
@@ -162,6 +163,7 @@ export const App: React.FC = () => {
                 {state.tab === 1 && (
                   <FloatingComposeButton
                     onClick={() => store.setState({ screen: 'compose', cpTo: '', cpSubject: '', cpBody: '' })}
+                    isNative={isNative}
                     dark={isDark}
                   />
                 )}
@@ -268,6 +270,7 @@ export const App: React.FC = () => {
                 promosCount={promosCount}
                 newsCount={newsCount}
                 trainingsCount={trainingsCount}
+                isNative={isNative}
                 dark={isDark}
               />
             )}

@@ -47,7 +47,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
   return (
     <div className="flex-1 flex flex-col bg-[var(--side)] relative z-40 overflow-hidden animate-fade-in">
       {/* Search Header */}
-      <div className="flex-none p-3.5 bg-[var(--side)] border-b border-[var(--line)]/50">
+      <div className="flex-none p-3.5 bg-[var(--side)] border-b border-[var(--line)]/50 pt-safe">
         <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-full bg-[var(--card)] border border-[var(--line)] shadow-xs">
           <Icon name="search" size={20} className="text-[var(--sub)]" />
           <input

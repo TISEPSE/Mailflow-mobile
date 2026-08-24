@@ -34,10 +34,10 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
   return (
     <div className="flex-1 flex flex-col bg-[var(--side)] relative z-40 overflow-hidden animate-fade-in">
       {/* Top Header Bar */}
-      <div className="flex-none flex items-center justify-between px-3 py-2 bg-[var(--side)] border-b border-[var(--line)]/50">
+      <div className="flex-none flex items-center justify-between px-3 py-2 bg-[var(--side)] border-b border-[var(--line)]/50 pt-safe">
         <button
           onClick={onBack}
-          className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-xs font-semibold text-[var(--fg)] hover:bg-[var(--sunk)] active:scale-95 transition-all"
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-[var(--fg)] hover:bg-[var(--sunk)] active:scale-95 transition-all cursor-pointer"
         >
           <Icon name="arrow_back" size={20} />
           <span>Boîte</span>
