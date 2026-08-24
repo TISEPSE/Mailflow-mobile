@@ -196,36 +196,36 @@ export const INITIAL_PROMOS: PromoMessage[] = [
 export const INITIAL_NEWS: NewsletterItem[] = [
   {
     id: 'n1',
-    name: 'TLDR AI',
+    name: 'TLDR AI Digest',
     email: 'dan@tldr.tech',
     initials: 'TL',
-    time: '08:00',
+    time: '07:02',
     tags: ['#IA', '#Tech'],
-    logoBg: '#D3E3FD',
-    logoFg: '#0842A0',
-    summary: "Meta publie Llama 3.3 en version ouverte, Google intègre un nouveau moteur de recherche multimodale, et l'Union européenne précise les règles de transparence pour les modèles fondateurs."
+    logoBg: '#1E293B',
+    logoFg: '#5EEAD4',
+    summary: "Trois lancements de modèles ouverts cette semaine, une levée de 200 M$ pour une start-up d'agents, et un banc d'essai qui remet en cause les scores de raisonnement annoncés."
   },
   {
     id: 'n2',
     name: 'Les Échos Matin',
     email: 'matin@lesechos.fr',
     initials: 'LE',
-    time: '07:30',
+    time: '06:30',
     tags: ['#Économie'],
-    logoBg: '#E9DCFB',
-    logoFg: '#5B2FA8',
-    summary: "Rebond surprise de la croissance en zone euro au deuxième trimestre, stabilisation des taux de la BCE, et tour de table historique pour une pépite française du stockage d'énergie."
+    logoBg: '#FDE8C8',
+    logoFg: '#8C5300',
+    summary: "L'inflation ralentit à 1,8 % sur douze mois. Le débat budgétaire s'ouvre sur les niches fiscales, et l'industrie du bâtiment signale une reprise des permis de construire."
   },
   {
     id: 'n3',
-    name: 'Sidebar IO',
-    email: 'hello@sidebar.io',
-    initials: 'SB',
+    name: 'Design Weekly',
+    email: 'hello@designweekly.co',
+    initials: 'DW',
     time: 'hier',
     tags: ['#Design'],
-    logoBg: '#FDE3DC',
-    logoFg: '#B3502F',
-    summary: 'Cinq ressources design sélectionnées : un guide complet du design tokens 2026, un retour d’expérience sur la refonte de Figma, et un comparatif des frameworks CSS modernes.'
+    logoBg: '#E9DCFB',
+    logoFg: '#5B2FA8',
+    summary: "Sélection d'outils et de composants UI : bibliothèques de micro-interactions, retours sur les Design Systems 2026 et typographies variables."
   },
   {
     id: 'n4',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MailMessage } from '../types';
 import { Icon } from '../components/Icon';
 import { AI_SUMMARIES_MOCK } from '../lib/mockData';
@@ -24,101 +24,188 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
   onReply,
   onOpenFolderSheet
 }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [aiExpanded, setAiExpanded] = useState(false);
+
   if (!mail) return null;
 
   const aiPoints = AI_SUMMARIES_MOCK[mail.id] || [
-    'Message lu et analysé par MailFlow.',
-    'Action recommandée : répondre ou classer dans vos dossiers.'
+    'Message lu et synthétisé par MailFlow.',
+    'Action recommandée : valider les modifications ou répondre.'
   ];
+
+  const handleAiClick = () => {
+    if (aiStatus === 'idle') {
+      onRequestAiSummary(mail.id);
+      setAiExpanded(true);
+    } else {
+      setAiExpanded(!aiExpanded);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--side)] relative z-40 overflow-hidden animate-fade-in">
       {/* Top Header Bar */}
-      <div className="flex-none flex items-center justify-between px-3 py-2 bg-[var(--side)] border-b border-[var(--line)]/50 pt-safe">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-[var(--fg)] hover:bg-[var(--sunk)] active:scale-95 transition-all cursor-pointer"
-        >
-          <Icon name="arrow_back" size={20} />
-          <span>Boîte</span>
-        </button>
+      <div className="flex-none flex items-center justify-between px-3 py-2.5 bg-[var(--side)] border-b border-[var(--line)]/40 pt-safe relative">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="p-2 -ml-1 rounded-full text-[var(--fg)] hover:bg-[var(--sunk)] active:scale-95 transition-all cursor-pointer"
+            aria-label="Retour"
+          >
+            <Icon name="arrow_back" size={22} />
+          </button>
+          <span className="text-lg font-semibold text-[var(--fg)] tracking-tight">
+            Message
+          </span>
+        </div>
 
-        {/* Action icons */}
-        <div className="flex items-center gap-1">
+        {/* Right 3-dots Menu Button */}
+        <div className="relative">
           <button
-            onClick={() => onArchive(mail.id)}
-            className="p-2 rounded-xl text-[var(--fg)] hover:bg-[var(--sunk)] active:scale-95 transition-all"
-            title="Archiver"
+            type="button"
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-2 rounded-full text-[var(--fg)] hover:bg-[var(--sunk)] active:scale-95 transition-all cursor-pointer"
+            aria-label="Options du message"
           >
-            <Icon name="inventory_2" size={20} />
+            <Icon name="more_vert" size={22} />
           </button>
-          <button
-            onClick={() => onOpenFolderSheet(mail.id)}
-            className="p-2 rounded-xl text-[var(--fg)] hover:bg-[var(--sunk)] active:scale-95 transition-all"
-            title="Déplacer vers"
-          >
-            <Icon name="drive_file_move" size={20} />
-          </button>
-          <button
-            onClick={() => onTrash(mail.id)}
-            className="p-2 rounded-xl text-[var(--fg)] hover:text-red-500 hover:bg-[var(--sunk)] active:scale-95 transition-all"
-            title="Supprimer"
-          >
-            <Icon name="delete" size={20} />
-          </button>
+
+          {/* Context Menu Popup (Image 2) */}
+          {menuOpen && (
+            <>
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setMenuOpen(false)} 
+              />
+              <div className="absolute right-0 top-11 z-50 min-w-[210px] bg-white dark:bg-[#232425] rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 p-2 animate-pop origin-top-right flex flex-col gap-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onReply(mail);
+                  }}
+                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
+                >
+                  <Icon name="reply" size={19} className="text-gray-600 dark:text-gray-300" />
+                  <span>Répondre</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleAiClick();
+                  }}
+                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
+                >
+                  <Icon name="auto_awesome" size={19} className="text-blue-600 dark:text-blue-400" />
+                  <span>Résumé IA</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onArchive(mail.id);
+                    onBack();
+                  }}
+                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
+                >
+                  <Icon name="archive" size={19} className="text-gray-600 dark:text-gray-300" />
+                  <span>Archiver</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onOpenFolderSheet(mail.id);
+                  }}
+                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left w-full cursor-pointer"
+                >
+                  <Icon name="folder_open" size={19} className="text-gray-600 dark:text-gray-300" />
+                  <span>Archiver dans...</span>
+                </button>
+
+                <div className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onTrash(mail.id);
+                    onBack();
+                  }}
+                  className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-[#B3261E] hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors text-left w-full cursor-pointer"
+                >
+                  <Icon name="delete" size={19} className="text-[#B3261E]" />
+                  <span>Supprimer</span>
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
       {/* Main Mail Content */}
-      <div className="flex-1 overflow-y-auto mf-scroll p-4 flex flex-col gap-4 pb-16">
-        {/* Subject */}
-        <h1 className="text-base font-bold text-[var(--fg)] leading-snug tracking-tight">
+      <div className="flex-1 overflow-y-auto mf-scroll p-4 flex flex-col gap-4">
+        {/* Subject Header */}
+        <h1 className="text-[21px] font-bold text-[var(--fg)] leading-snug tracking-tight">
           {mail.subject}
         </h1>
 
-        {/* Sender details card */}
-        <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--card)] border border-[var(--line)]/50">
-          <div className="w-10 h-10 rounded-full flex-none bg-[var(--accent-soft)] text-[var(--accent-fg)] flex items-center justify-center text-xs font-bold">
+        {/* Sender details (Image 1) */}
+        <div className="flex items-center gap-3 pt-1">
+          {/* Avatar (Peach/warm tone for TN or custom initials) */}
+          <div className="w-11 h-11 rounded-full flex-none bg-[#FFDBCF] text-[#6E3024] dark:bg-[#733324] dark:text-[#FFDBCF] flex items-center justify-center text-sm font-bold shadow-2xs">
             {mail.initials}
           </div>
+
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-bold text-[var(--fg)] truncate">{mail.from}</div>
-            <div className="text-[11px] text-[var(--sub)] truncate">{mail.email}</div>
+            <div className="text-sm font-bold text-[var(--fg)] truncate">
+              {mail.from}
+            </div>
+            <div className="text-xs text-[var(--sub)] truncate">
+              {mail.email}
+            </div>
           </div>
-          <div className="text-[11px] text-[var(--sub)] flex-none">{mail.time}</div>
+
+          <div className="text-xs text-[var(--sub)] flex-none">
+            {mail.full || mail.time}
+          </div>
         </div>
 
-        {/* AI Summary Block */}
-        <div className={`p-4 rounded-2xl bg-[var(--card)] border transition-all ${
-          aiStatus === 'busy' ? 'carte-en-resume border-[var(--accent)]' : 'border-[var(--line)]/60'
-        }`}>
-          {aiStatus === 'idle' && (
-            <button
-              onClick={() => onRequestAiSummary(mail.id)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[var(--accent-soft)]/50 hover:bg-[var(--accent-soft)] text-[var(--accent-fg)] text-xs font-bold transition-all active:scale-98 cursor-pointer"
-            >
-              <Icon name="auto_awesome" size={18} className="text-[var(--accent)]" />
-              <span>Résumer ce message avec l'IA</span>
-            </button>
-          )}
+        {/* AI Summary Chip / Card (Image 1) */}
+        <div className="self-start flex flex-col gap-2 pt-1">
+          <button
+            type="button"
+            onClick={handleAiClick}
+            className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-[#D3E3FD]/50 hover:bg-[#D3E3FD] border border-[#0B57D0]/20 text-[#0B57D0] dark:bg-[#0842A0]/40 dark:text-[#A8C7FA] text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs"
+          >
+            <Icon name="auto_awesome" size={17} className="text-[#0B57D0] dark:text-[#A8C7FA]" filled />
+            <span>Résumé IA</span>
+          </button>
 
+          {/* AI Progress / Card */}
           {aiStatus === 'busy' && (
-            <div className="flex items-center gap-3 py-2 text-xs font-semibold text-[var(--accent-fg)]">
-              <Icon name="auto_awesome" size={20} className="etincelle-ia text-[var(--accent)]" />
-              <span>Génération du résumé en cours…</span>
+            <div className="p-3 rounded-2xl bg-[#D3E3FD]/30 border border-[#0B57D0]/40 text-xs font-semibold text-[#0B57D0] flex items-center gap-2.5 animate-pulse">
+              <Icon name="auto_awesome" size={18} className="etincelle-ia text-[#0B57D0]" />
+              <span>Génération du résumé IA en cours…</span>
             </div>
           )}
 
-          {aiStatus === 'done' && (
-            <div className="flex flex-col gap-2 animate-fade-in">
-              <div className="flex items-center gap-2 pb-2 border-b border-[var(--line)]/40 text-xs font-bold text-[var(--accent-fg)]">
-                <Icon name="auto_awesome" size={16} filled className="text-[var(--accent)]" />
+          {(aiStatus === 'done' || aiExpanded) && aiStatus !== 'busy' && (
+            <div className="p-4 rounded-3xl bg-white dark:bg-[#232425] border border-blue-100 dark:border-blue-900/40 shadow-sm animate-fade-in flex flex-col gap-2 mt-1">
+              <div className="flex items-center gap-2 pb-1.5 border-b border-gray-100 dark:border-gray-800 text-xs font-bold text-[#0B57D0] dark:text-[#A8C7FA]">
+                <Icon name="auto_awesome" size={16} filled />
                 <span>Points clés synthétisés par l'IA</span>
               </div>
-              <ul className="flex flex-col gap-1.5 pl-2 pt-1 text-xs text-[var(--fg)] leading-relaxed">
+              <ul className="flex flex-col gap-1.5 pl-1 pt-1 text-xs text-[var(--fg)] leading-relaxed">
                 {aiPoints.map((pt, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] mt-1.5 flex-none" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#0B57D0] mt-1.5 flex-none" />
                     <span>{pt}</span>
                   </li>
                 ))}
@@ -128,21 +215,24 @@ export const MailReaderView: React.FC<MailReaderViewProps> = ({
         </div>
 
         {/* Message Body Paragraphs */}
-        <div className="p-4 rounded-2xl bg-[var(--card)] border border-[var(--line)]/60 flex flex-col gap-3 text-xs text-[var(--fg)] leading-relaxed shadow-xs">
+        <div className="flex flex-col gap-3 text-sm text-[var(--fg)] leading-relaxed pt-2">
           {mail.body.map((paragraph, i) => (
-            <p key={i} className="whitespace-pre-line">
+            <p key={i} className="whitespace-pre-line leading-relaxed">
               {paragraph}
             </p>
           ))}
         </div>
+      </div>
 
-        {/* Quick Reply Button */}
+      {/* Bottom Sticky Primary Blue Reply Button (Image 1) */}
+      <div className="flex-none p-4 pt-2 bg-gradient-to-t from-[var(--side)] via-[var(--side)] to-transparent">
         <button
+          type="button"
           onClick={() => onReply(mail)}
-          className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-[var(--card)] border border-[var(--line)] hover:bg-[var(--sunk)] text-[var(--fg)] font-semibold text-xs transition-all active:scale-98 cursor-pointer mt-2"
+          className="w-full py-3.5 px-6 rounded-full bg-[#0B57D0] hover:bg-[#0842A0] text-white font-medium text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer"
         >
-          <Icon name="reply" size={18} />
-          <span>Répondre à {mail.from}</span>
+          <Icon name="reply" size={19} className="text-white" />
+          <span>Répondre</span>
         </button>
       </div>
     </div>

@@ -9,10 +9,25 @@ interface RulesViewProps {
   onCreateRule: () => void;
 }
 
-const CATEGORY_CONFIG: Record<RuleCategory, { label: string; icon: string; color: string }> = {
-  publicite: { label: 'Publicités', icon: 'delete_sweep', color: '#C5221F' },
-  newsletter: { label: 'Newsletters', icon: 'auto_awesome', color: '#8E24AA' },
-  formation: { label: 'Formations', icon: 'schedule', color: '#0F9D58' }
+const CATEGORY_CONFIG: Record<RuleCategory, { label: string; icon: string; bg: string; fg: string }> = {
+  publicite: { 
+    label: 'Publicités', 
+    icon: 'delete', 
+    bg: '#F9DEDC', 
+    fg: '#8C1D18' 
+  },
+  newsletter: { 
+    label: 'Newsletters', 
+    icon: 'auto_awesome', 
+    bg: '#E8DEF8', 
+    fg: '#6750A4' 
+  },
+  formation: { 
+    label: 'Formations', 
+    icon: 'schedule', 
+    bg: '#C4EED0', 
+    fg: '#0F5223' 
+  }
 };
 
 export const RulesView: React.FC<RulesViewProps> = ({
@@ -24,81 +39,73 @@ export const RulesView: React.FC<RulesViewProps> = ({
   const getRuleActionText = (r: AutoRule) => {
     if (r.action === 'supprimer_toujours') return `Supprimer automatiquement tout de ${r.email}`;
     if (r.action === 'generer_resume_et_archiver') return `Résumer par IA puis archiver · ${r.email}`;
-    return `Archiver chaque ${r.day || 'vendredi'} à ${(r.hour || '18:00').replace(':', ' h ')}`;
+    return `Archive chaque ${r.day || 'vendredi'} à ${(r.hour || '18:00').replace(':', ' h ')}`;
   };
 
   const categories: RuleCategory[] = ['publicite', 'newsletter', 'formation'];
 
   return (
-    <div className="flex-1 overflow-y-auto mf-scroll px-3 pt-1 pb-20 flex flex-col gap-4">
-      {/* Create rule button header */}
-      <button
-        onClick={onCreateRule}
-        className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-[var(--accent)] text-white font-semibold text-xs shadow-md active:scale-98 transition-all cursor-pointer"
-      >
-        <Icon name="add" size={20} />
-        <span>Créer une nouvelle règle automatique</span>
-      </button>
-
-      {/* Grouped Rules by Category */}
+    <div className="flex-1 overflow-y-auto mf-scroll px-3.5 pt-1 pb-24 flex flex-col gap-4 relative">
+      {/* Grouped Rules by Category (Image 4) */}
       {categories.map((cat) => {
         const catRules = rules.filter(r => r.cat === cat);
         if (catRules.length === 0) return null;
 
         const config = CATEGORY_CONFIG[cat];
-        const activeCount = catRules.filter(r => r.active).length;
+        const countText = catRules.length > 1 ? `${catRules.length} règles` : `${catRules.length} règle`;
 
         return (
-          <div key={cat} className="flex flex-col gap-2">
-            <div className="flex items-center justify-between px-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold uppercase tracking-wider text-[var(--fg)]">
-                  {config.label}
-                </span>
-                <span className="text-[11px] text-[var(--sub)] font-medium">
-                  ({activeCount}/{catRules.length} actives)
-                </span>
-              </div>
+          <div key={cat} className="flex flex-col gap-1.5">
+            {/* Category Header */}
+            <div className="flex items-center gap-2 px-1 text-xs font-bold text-[var(--fg)]">
+              <span>{config.label}</span>
+              <span className="text-[11px] font-normal text-[var(--sub)]">
+                {countText}
+              </span>
             </div>
 
-            <div className="rounded-3xl bg-[var(--card)] border border-[var(--line)]/60 overflow-hidden shadow-xs divide-y divide-[var(--line)]/50">
+            {/* Rule Cards */}
+            <div className="flex flex-col gap-2">
               {catRules.map((rule) => (
                 <div
                   key={rule.id}
                   onClick={() => onEditRule(rule)}
-                  className={`p-3.5 flex items-start gap-3.5 cursor-pointer hover:bg-[var(--sunk)] transition-colors ${
-                    !rule.active ? 'opacity-50' : ''
-                  }`}
+                  className="p-4 rounded-3xl bg-[var(--card)] border border-[var(--line)]/50 shadow-xs flex items-center justify-between gap-3.5 cursor-pointer hover:bg-[var(--sunk)] active:scale-[0.99] transition-all"
                 >
+                  {/* Category Circle Icon */}
                   <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center flex-none mt-0.5"
-                    style={{ backgroundColor: `${config.color}20`, color: config.color }}
+                    className="w-11 h-11 rounded-full flex items-center justify-center flex-none"
+                    style={{ backgroundColor: config.bg, color: config.fg }}
                   >
-                    <Icon name={config.icon} size={18} />
+                    <Icon name={config.icon} size={20} filled />
                   </div>
 
+                  {/* Title & Description */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-[var(--fg)] truncate">{rule.nom}</div>
-                    <div className="text-[11.5px] text-[var(--sub)] leading-snug mt-0.5 line-clamp-2">
+                    <div className="text-sm font-bold text-[var(--fg)] truncate">
+                      {rule.nom}
+                    </div>
+                    <div className="text-xs text-[var(--sub)] truncate mt-0.5">
                       {getRuleActionText(rule)}
                     </div>
                   </div>
 
-                  {/* Active Toggle Switch */}
+                  {/* M3 Toggle Switch (Image 4) */}
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
                       onToggleRule(rule.id);
                     }}
-                    className="flex-none pt-0.5"
+                    className="flex-none cursor-pointer p-1 -mr-1"
+                    title={rule.active ? 'Mettre en pause' : 'Activer'}
                   >
                     <div
-                      className={`w-10 h-5 rounded-full transition-colors relative p-0.5 ${
-                        rule.active ? 'bg-[var(--accent)]' : 'bg-[var(--line)]'
+                      className={`w-12 h-7 rounded-full p-1 transition-colors duration-200 ease-in-out flex items-center ${
+                        rule.active ? 'bg-[#0B57D0]' : 'bg-gray-300 dark:bg-gray-700'
                       }`}
                     >
                       <div
-                        className={`w-4 h-4 rounded-full bg-white shadow-xs transition-transform ${
+                        className={`w-5 h-5 rounded-full bg-white shadow-xs transform transition-transform duration-200 ease-in-out ${
                           rule.active ? 'translate-x-5' : 'translate-x-0'
                         }`}
                       />
@@ -110,6 +117,23 @@ export const RulesView: React.FC<RulesViewProps> = ({
           </div>
         );
       })}
+
+      {/* Helper text footer (Image 4) */}
+      <p className="text-xs text-[var(--sub)] px-1 leading-relaxed mt-1">
+        Touchez une règle pour la modifier ou la supprimer, l'interrupteur la met en pause.
+      </p>
+
+      {/* Floating Blue Pill Button: Nouvelle Règle (Image 4) */}
+      <div className="fixed bottom-20 right-4 z-30">
+        <button
+          type="button"
+          onClick={onCreateRule}
+          className="flex items-center gap-2 py-3.5 px-5 rounded-2xl bg-[#0B57D0] hover:bg-[#0842A0] text-white font-semibold text-xs shadow-lg active:scale-95 transition-all cursor-pointer"
+        >
+          <Icon name="tune" size={18} className="text-white" />
+          <span>Nouvelle règle</span>
+        </button>
+      </div>
     </div>
   );
 };
