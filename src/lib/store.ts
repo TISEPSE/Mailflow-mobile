@@ -464,7 +464,80 @@ export const store = {
     }
   },
 
-  // Compose
+  // Rule Engine Execution (Desktop Parity)
+  applyRulesEngine: () => {
+    const activeRules = globalState.rules.filter(r => r.active);
+    if (activeRules.length === 0) return;
+
+    let modified = false;
+    let newMails = [...globalState.mails];
+    let newPromos = [...globalState.promos];
+    let newTrash = [...globalState.trash];
+    let newArchived = { ...globalState.archived };
+    let firedCount = 0;
+
+    activeRules.forEach(rule => {
+      if (rule.action === 'supprimer_toujours') {
+        // Filter out promos matching rule email
+        const matchingPromos = newPromos.filter(p => p.email === rule.email);
+        if (matchingPromos.length > 0) {
+          modified = true;
+          firedCount += matchingPromos.length;
+          newPromos = newPromos.filter(p => p.email !== rule.email);
+          matchingPromos.forEach(p => {
+            newTrash.unshift({
+              tid: `rule-promo-${p.id}-${Date.now()}`,
+              kind: 'promo',
+              item: p,
+              label: p.subject,
+              sub: p.name
+            });
+          });
+        }
+
+        // Filter out mails matching rule email
+        const matchingMails = newMails.filter(m => m.email === rule.email);
+        if (matchingMails.length > 0) {
+          modified = true;
+          firedCount += matchingMails.length;
+          newMails = newMails.filter(m => m.email !== rule.email);
+          matchingMails.forEach(m => {
+            newTrash.unshift({
+              tid: `rule-mail-${m.id}-${Date.now()}`,
+              kind: 'mail',
+              item: m,
+              label: m.subject,
+              sub: m.from
+            });
+          });
+        }
+      } else if (rule.action === 'generer_resume_et_archiver') {
+        const matchingMails = newMails.filter(m => m.email === rule.email);
+        if (matchingMails.length > 0) {
+          modified = true;
+          firedCount += matchingMails.length;
+          newMails = newMails.filter(m => m.email !== rule.email);
+          newArchived['Newsletters'] = (newArchived['Newsletters'] || 0) + matchingMails.length;
+        }
+      }
+    });
+
+    if (modified) {
+      globalState = {
+        ...globalState,
+        mails: newMails,
+        promos: newPromos,
+        trash: newTrash,
+        archived: newArchived
+      };
+      notify();
+      if (firedCount > 0) {
+        store.flash(`Moteur MailFlow : ${firedCount} message(s) traité(s) par vos règles`);
+      }
+    }
+  },
+
+  // Compose & Send
   sendMail: async () => {
     const { cpTo, cpSubject, cpBody } = globalState;
     if (!cpTo.trim() || !cpTo.includes('@')) {
@@ -475,8 +548,25 @@ export const store = {
 
     try {
       await tauriBridge.sendMessage([cpTo], [], cpSubject, cpBody);
+      
+      // Record sent message in local state
+      const sentCount = (globalState.archived['Envoyés'] || 0) + 1;
+      const sentMail: MailMessage = {
+        id: `sent_${Date.now()}`,
+        from: globalState.account,
+        email: cpTo,
+        initials: cpTo.slice(0, 2).toUpperCase(),
+        time: 'à l’instant',
+        full: "Aujourd'hui à l'instant",
+        unread: false,
+        subject: cpSubject || '(sans objet)',
+        snippet: cpBody.slice(0, 80),
+        body: [cpBody]
+      };
+
       globalState = {
         ...globalState,
+        archived: { ...globalState.archived, Envoyés: sentCount },
         screen: null,
         cpTo: '',
         cpSubject: '',

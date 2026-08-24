@@ -66,7 +66,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               onClick={() => onSelectTab(item.id)}
               className="w-full flex flex-col items-center justify-center py-0.5 px-0 relative cursor-pointer active:scale-95 transition-transform"
             >
-              {/* Active Indicator Pill */}
+              {/* Active Indicator Pill - Perfectly Centered */}
               <div
                 className="w-14 h-8 rounded-full flex items-center justify-center relative transition-colors duration-150"
                 style={{
@@ -83,10 +83,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   }}
                 />
 
-                {/* Red Circular Badge */}
+                {/* Red Circular Badge anchored relative to top right of pill */}
                 {item.badgeCount > 0 && (
                   <span
-                    className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs bg-[#B3261E] text-white"
+                    className="absolute top-0 right-1.5 min-w-[16px] h-[16px] px-1 rounded-full text-[9.5px] font-bold flex items-center justify-center shadow-xs bg-[#B3261E] text-white pointer-events-none"
                   >
                     {item.badgeCount}
                   </span>

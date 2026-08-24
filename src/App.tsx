@@ -24,6 +24,7 @@ import { RuleEditorView } from './views/RuleEditorView';
 import { OnboardingView } from './views/OnboardingView';
 
 import { Capacitor } from '@capacitor/core';
+import { App as CapApp } from '@capacitor/app';
 
 export const App: React.FC = () => {
   const { state, store } = useAppStore();
@@ -40,6 +41,50 @@ export const App: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [state.theme]);
+
+  // Execute MailFlow auto-rules engine on load
+  useEffect(() => {
+    store.applyRulesEngine();
+  }, []);
+
+  // Android Hardware / Gesture Back Button Handler
+  useEffect(() => {
+    if (!isNative) return;
+
+    const backListener = CapApp.addListener('backButton', () => {
+      const s = store.getState();
+
+      // 1. Close open sheets / modals
+      if (s.acctOpen || s.sheet) {
+        store.setState({ acctOpen: false, sheet: null });
+        return;
+      }
+
+      // 2. Return from full-screen views to main view
+      if (s.screen) {
+        store.setState({ 
+          screen: null, 
+          selectedMailId: null, 
+          selectedPromoId: null, 
+          editingRuleId: null 
+        });
+        return;
+      }
+
+      // 3. Return from sub-tab to Mails tab (tab 1)
+      if (s.tab !== 1) {
+        store.setState({ tab: 1 });
+        return;
+      }
+
+      // 4. On main tab 1 with no open overlays, minimize app instead of exiting
+      CapApp.minimizeApp();
+    });
+
+    return () => {
+      backListener.then(h => h.remove()).catch(() => {});
+    };
+  }, [isNative]);
 
   const currentAccount = state.accounts.find(a => a.email === state.account) || state.accounts[0];
   const isDark = state.theme === 'dark';
@@ -109,7 +154,7 @@ export const App: React.FC = () => {
 
             {/* Main Tabs Navigation Body */}
             {!state.screen && (
-              <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
+              <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden animate-fade-scale-in">
                 {state.tab === 1 && (
                   <CourrierView
                     mails={state.mails}
@@ -170,95 +215,109 @@ export const App: React.FC = () => {
               </div>
             )}
 
-            {/* Full-Screen Views */}
+            {/* Animated Full-Screen Views with Native Right-Slide Animation */}
             {state.screen === 'mail' && (
-              <MailReaderView
-                mail={selectedMail}
-                aiStatus={selectedMail ? state.aiSum[selectedMail.id] || 'idle' : 'idle'}
-                onBack={() => store.setState({ screen: null, selectedMailId: null })}
-                onArchive={store.archiveMail}
-                onTrash={store.trashMail}
-                onRequestAiSummary={store.requestAiSummary}
-                onReply={(m) => store.setState({
-                  screen: 'compose',
-                  cpTo: m.email,
-                  cpSubject: `Re: ${m.subject}`,
-                  cpBody: `\n\n--- En réponse à ${m.from} ---\n${m.body.join('\n')}`
-                })}
-                onOpenFolderSheet={() => store.setState({ sheet: 'folder' })}
-              />
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+                <MailReaderView
+                  mail={selectedMail}
+                  aiStatus={selectedMail ? state.aiSum[selectedMail.id] || 'idle' : 'idle'}
+                  onBack={() => store.setState({ screen: null, selectedMailId: null })}
+                  onArchive={store.archiveMail}
+                  onTrash={store.trashMail}
+                  onRequestAiSummary={store.requestAiSummary}
+                  onReply={(m) => store.setState({
+                    screen: 'compose',
+                    cpTo: m.email,
+                    cpSubject: `Re: ${m.subject}`,
+                    cpBody: `\n\n--- En réponse à ${m.from} ---\n${m.body.join('\n')}`
+                  })}
+                  onOpenFolderSheet={() => store.setState({ sheet: 'folder' })}
+                />
+              </div>
             )}
 
             {state.screen === 'promo' && (
-              <PromoReaderView
-                promo={selectedPromo}
-                onBack={() => store.setState({ screen: null, selectedPromoId: null })}
-                onTrash={store.trashPromo}
-                onBlockAndTrash={store.blockAndTrashPromo}
-              />
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+                <PromoReaderView
+                  promo={selectedPromo}
+                  onBack={() => store.setState({ screen: null, selectedPromoId: null })}
+                  onTrash={store.trashPromo}
+                  onBlockAndTrash={store.blockAndTrashPromo}
+                />
+              </div>
             )}
 
             {state.screen === 'digest' && (
-              <DigestView
-                onBack={() => store.setState({ screen: null })}
-              />
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+                <DigestView
+                  onBack={() => store.setState({ screen: null })}
+                />
+              </div>
             )}
 
             {state.screen === 'settings' && (
-              <SettingsView
-                settings={state.settings}
-                notif={state.notif}
-                accounts={state.accounts}
-                theme={state.theme}
-                onBack={() => store.setState({ screen: null })}
-                onUpdateSettings={(s) => store.setState({ settings: { ...state.settings, ...s } })}
-                onUpdateNotif={(n) => store.setState({ notif: { ...state.notif, ...n } })}
-                onToggleTheme={() => store.setState({ theme: state.theme === 'dark' ? 'light' : 'dark' })}
-                onSetAccentColor={(color) => store.setState({
-                  settings: { ...state.settings, accentColor: color }
-                })}
-                onLogout={() => {
-                  store.setState({ onboarded: false, screen: null });
-                  store.flash('Session déconnectée');
-                }}
-              />
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+                <SettingsView
+                  settings={state.settings}
+                  notif={state.notif}
+                  accounts={state.accounts}
+                  theme={state.theme}
+                  onBack={() => store.setState({ screen: null })}
+                  onUpdateSettings={(s) => store.setState({ settings: { ...state.settings, ...s } })}
+                  onUpdateNotif={(n) => store.setState({ notif: { ...state.notif, ...n } })}
+                  onToggleTheme={() => store.setState({ theme: state.theme === 'dark' ? 'light' : 'dark' })}
+                  onSetAccentColor={(color) => store.setState({
+                    settings: { ...state.settings, accentColor: color }
+                  })}
+                  onLogout={() => {
+                    store.setState({ onboarded: false, screen: null });
+                    store.flash('Session déconnectée');
+                  }}
+                />
+              </div>
             )}
 
             {state.screen === 'compose' && (
-              <ComposeView
-                initialTo={state.cpTo}
-                initialSubject={state.cpSubject}
-                initialBody={state.cpBody}
-                onClose={() => store.setState({ screen: null })}
-                onSend={(to, subject, body) => {
-                  store.setState({ cpTo: to, cpSubject: subject, cpBody: body });
-                  store.sendMail();
-                }}
-              />
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+                <ComposeView
+                  initialTo={state.cpTo}
+                  initialSubject={state.cpSubject}
+                  initialBody={state.cpBody}
+                  onClose={() => store.setState({ screen: null })}
+                  onSend={(to, subject, body) => {
+                    store.setState({ cpTo: to, cpSubject: subject, cpBody: body });
+                    store.sendMail();
+                  }}
+                />
+              </div>
             )}
 
             {state.screen === 'search' && (
-              <SearchView
-                mails={state.mails}
-                promos={state.promos}
-                news={state.news}
-                onClose={() => store.setState({ screen: null })}
-                onOpenMail={(id) => {
-                  store.openMail(id);
-                }}
-                onOpenPromo={(id) => {
-                  store.openPromo(id);
-                }}
-              />
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+                <SearchView
+                  mails={state.mails}
+                  promos={state.promos}
+                  news={state.news}
+                  onClose={() => store.setState({ screen: null })}
+                  onOpenMail={(id) => {
+                    store.openMail(id);
+                  }}
+                  onOpenPromo={(id) => {
+                    store.openPromo(id);
+                  }}
+                />
+              </div>
             )}
 
             {state.screen === 'newRule' && (
-              <RuleEditorView
-                initialRule={editingRule}
-                onClose={() => store.setState({ screen: null, editingRuleId: null })}
-                onSave={store.saveRule}
-                onDelete={store.deleteRule}
-              />
+              <div className="flex-1 flex flex-col h-full w-full absolute inset-0 z-40 bg-[var(--side)] animate-slide-in-right">
+                <RuleEditorView
+                  initialRule={editingRule}
+                  onClose={() => store.setState({ screen: null, editingRuleId: null })}
+                  onSave={store.saveRule}
+                  onDelete={store.deleteRule}
+                />
+              </div>
             )}
 
             {/* Bottom Nav Bar (when on main tabs) */}
