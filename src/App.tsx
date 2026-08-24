@@ -23,9 +23,13 @@ import { SearchView } from './views/SearchView';
 import { RuleEditorView } from './views/RuleEditorView';
 import { OnboardingView } from './views/OnboardingView';
 
+import { Capacitor } from '@capacitor/core';
+
 export const App: React.FC = () => {
   const { state, store } = useAppStore();
   const [selectedTrainingForSchedule, setSelectedTrainingForSchedule] = useState<string | null>(null);
+
+  const isNative = Capacitor.isNativePlatform();
 
   // Set theme attributes on HTML root
   useEffect(() => {
@@ -78,7 +82,7 @@ export const App: React.FC = () => {
     >
       <AndroidFrame
         dark={isDark}
-        enabled={state.isFrameEnabled}
+        enabled={!isNative && state.isFrameEnabled}
         onToggleFrame={() => store.setState({ isFrameEnabled: !state.isFrameEnabled })}
       >
         {/* Onboarding Wizard Screen */}

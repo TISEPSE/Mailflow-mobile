@@ -284,6 +284,7 @@ export const INITIAL_TRAININGS: TrainingItem[] = [
     dayName: 'mar.',
     dayNum: '30',
     monthName: 'sept.',
+    soon: false,
     title: 'Votre certificat UX Research est prêt à télécharger',
     when: "valable jusqu'au 30 sept.",
     automated: true
@@ -299,6 +300,7 @@ export const INITIAL_TRAININGS: TrainingItem[] = [
     dayName: 'ven.',
     dayNum: '05',
     monthName: 'sept.',
+    soon: false,
     title: 'Inscription aux unités d’enseignement du semestre',
     when: 'clôture à 17 h 00',
     automated: false
