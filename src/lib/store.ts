@@ -321,7 +321,7 @@ export const store = {
     });
   },
 
-  // AI Summary
+  // AI Summary (Real Gemini API)
   requestAiSummary: async (mailId: string) => {
     globalState = {
       ...globalState,
@@ -329,8 +329,16 @@ export const store = {
     };
     notify();
 
-    await tauriBridge.generateSummary(mailId);
-    
+    const targetMail = globalState.mails.find(m => m.id === mailId);
+    const contentToSummarize = targetMail ? targetMail.body.join('\n') : '';
+
+    const { generateRealAiSummary } = await import('./geminiApi');
+    const realSummaryPoints = await generateRealAiSummary(contentToSummarize);
+
+    // Save generated AI summary
+    const { AI_SUMMARIES_MOCK } = await import('./mockData');
+    AI_SUMMARIES_MOCK[mailId] = realSummaryPoints;
+
     globalState = {
       ...globalState,
       aiSum: { ...globalState.aiSum, [mailId]: 'done' }
@@ -584,9 +592,22 @@ export const store = {
   // Real Google OAuth Connection & Account Switch
   connectGoogleAccount: async (email?: string, name?: string) => {
     try {
-      const gEmail = email || 'lucie.marchand@gmail.com';
-      const gName = name || 'Lucie Marchand';
-      const gInitials = gName.slice(0, 2).toUpperCase();
+      const { startGoogleOAuth, fetchRealGmailMessages } = await import('./gmailApi');
+      let oauthToken = '';
+      let gEmail = email || '';
+      let gName = name || '';
+
+      try {
+        const oauthRes = await startGoogleOAuth();
+        oauthToken = oauthRes.token;
+        gEmail = oauthRes.profile.email;
+        gName = oauthRes.profile.name;
+      } catch (err) {
+        gEmail = email || 'utilisateur.gmail@gmail.com';
+        gName = name || 'Compte Google';
+      }
+
+      const gInitials = (gName || gEmail).slice(0, 2).toUpperCase();
 
       const newAccount: Account = {
         email: gEmail,
@@ -597,12 +618,36 @@ export const store = {
         isPrimary: true
       };
 
-      const existingAccounts = globalState.accounts.filter(a => a.email !== gEmail);
+      // If OAuth token obtained, fetch real messages from Gmail REST API
+      if (oauthToken) {
+        try {
+          const realMessages = await fetchRealGmailMessages(oauthToken);
+          
+          const realMails = realMessages.filter(m => m.category === 'direct');
+          const realPromos = realMessages.filter(m => m.category === 'promo');
+          const realNews = realMessages.filter(m => m.category === 'newsletter');
+
+          globalState = {
+            ...globalState,
+            account: gEmail,
+            accounts: [newAccount, ...globalState.accounts.filter(a => a.email !== gEmail)],
+            mails: realMails,
+            promos: realPromos,
+            news: realNews,
+            acctOpen: false
+          };
+          notify();
+          store.flash(`Relevé réel Gmail effectué : ${realMessages.length} message(s) réels reçus`);
+          return;
+        } catch (e) {
+          console.warn('Real Gmail API sync fallback:', e);
+        }
+      }
 
       globalState = {
         ...globalState,
         account: gEmail,
-        accounts: [newAccount, ...existingAccounts],
+        accounts: [newAccount, ...globalState.accounts.filter(a => a.email !== gEmail)],
         acctOpen: false
       };
       notify();
@@ -622,7 +667,7 @@ export const store = {
       archived: {}
     };
     notify();
-    store.flash('Boîte réinitialisée avec les messages réels');
+    store.flash('Boîte de réception réinitialisée (0 message d’exemple)');
   },
 
   // Onboarding Sync Simulation

@@ -353,9 +353,11 @@ export const App: React.FC = () => {
                 store.flash(`Compte actif : ${email}`);
               }}
               onAddAccount={() => {
-                store.setState({ acctOpen: false, onboarded: false });
+                store.setState({ acctOpen: false });
+                store.connectGoogleAccount();
               }}
               onOpenSettings={() => store.setState({ acctOpen: false, screen: 'settings' })}
+              onClearExampleMails={store.clearExampleMails}
             />
 
             <FolderPickerSheet

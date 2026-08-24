@@ -1,6 +1,7 @@
 import React from 'react';
 import { Account } from '../types';
 import { Icon } from './Icon';
+import { LogoGoogle } from './LogoGoogle';
 
 interface AccountSwitcherSheetProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface AccountSwitcherSheetProps {
   onSelectAccount: (email: string) => void;
   onAddAccount: () => void;
   onOpenSettings: () => void;
+  onClearExampleMails?: () => void;
 }
 
 export const AccountSwitcherSheet: React.FC<AccountSwitcherSheetProps> = ({
@@ -20,6 +22,7 @@ export const AccountSwitcherSheet: React.FC<AccountSwitcherSheetProps> = ({
   onSelectAccount,
   onAddAccount,
   onOpenSettings,
+  onClearExampleMails
 }) => {
   if (!isOpen) return null;
 
@@ -34,9 +37,9 @@ export const AccountSwitcherSheet: React.FC<AccountSwitcherSheetProps> = ({
         className="w-full max-w-[340px] rounded-[32px] p-6 bg-white dark:bg-[#232425] border border-gray-100 dark:border-gray-800 shadow-2xl animate-pop relative flex flex-col items-center select-none"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Main Active Account Avatar (Image 4) */}
+        {/* Main Active Account Avatar */}
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-sm mb-2"
+          className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shadow-sm mb-2 relative"
           style={{ 
             backgroundColor: currentAccount.avatarBg || '#0B57D0', 
             color: currentAccount.avatarFg || '#FFFFFF' 
@@ -46,14 +49,15 @@ export const AccountSwitcherSheet: React.FC<AccountSwitcherSheetProps> = ({
         </div>
 
         {/* User Name & Email */}
-        <div className="text-base font-bold text-gray-900 dark:text-gray-100 text-center">
-          {currentAccount.name}
+        <div className="text-base font-bold text-gray-900 dark:text-gray-100 text-center flex items-center justify-center gap-1.5">
+          <span>{currentAccount.name}</span>
+          <LogoGoogle taille="16px" />
         </div>
         <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-0.5 mb-3.5">
           {currentAccount.email}
         </div>
 
-        {/* Manage Account Pill Button (Image 4) */}
+        {/* Manage Account Pill Button */}
         <button
           type="button"
           onClick={() => {
@@ -66,7 +70,7 @@ export const AccountSwitcherSheet: React.FC<AccountSwitcherSheetProps> = ({
           <span>Gérer votre compte</span>
         </button>
 
-        {/* Nested Accounts List Card (Image 4) */}
+        {/* Nested Accounts List Card */}
         <div className="w-full rounded-2xl bg-white dark:bg-[#1E1F20] border border-gray-100 dark:border-gray-800 overflow-hidden divide-y divide-gray-100 dark:divide-gray-800/80 shadow-2xs">
           {otherAccounts.map((acct) => (
             <button
@@ -95,7 +99,7 @@ export const AccountSwitcherSheet: React.FC<AccountSwitcherSheetProps> = ({
             </button>
           ))}
 
-          {/* Add another account row */}
+          {/* Add another account via Google OAuth */}
           <button
             type="button"
             onClick={() => {
@@ -104,13 +108,32 @@ export const AccountSwitcherSheet: React.FC<AccountSwitcherSheetProps> = ({
             }}
             className="flex items-center gap-3.5 p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-left w-full cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-full flex-none bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300">
-              <Icon name="person_add" size={17} />
+            <div className="w-8 h-8 rounded-full flex-none bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center text-[#0B57D0] dark:text-blue-400">
+              <LogoGoogle taille="18px" />
             </div>
             <div className="text-xs font-bold text-gray-800 dark:text-gray-200">
-              Ajouter un autre compte
+              Connecter un compte Google OAuth
             </div>
           </button>
+
+          {/* Clear example demo emails button */}
+          {onClearExampleMails && (
+            <button
+              type="button"
+              onClick={() => {
+                onClearExampleMails();
+                onClose();
+              }}
+              className="flex items-center gap-3.5 p-3 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors text-left w-full cursor-pointer text-[#C5221F]"
+            >
+              <div className="w-8 h-8 rounded-full flex-none bg-red-100 dark:bg-red-950 flex items-center justify-center text-[#C5221F]">
+                <Icon name="delete_sweep" size={18} />
+              </div>
+              <div className="text-xs font-bold">
+                Supprimer les mails de démo
+              </div>
+            </button>
+          )}
         </div>
       </div>
     </div>
